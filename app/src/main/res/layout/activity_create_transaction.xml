@@ -5,139 +5,138 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CreateNewTaskActivity">
+    android:padding="16dp"
+    tools:context=".CreateTransactionActivity">
 
     <TextView
         android:id="@+id/titlePageCreateEdit"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Thêm mới"
-        android:textSize="34sp"
+        android:text="Thêm Giao dịch Mới"
+        android:textAlignment="center"
+        android:textSize="28sp"
         android:textStyle="bold"
+        android:textColor="@android:color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- RadioGroup để chọn Thu hoặc Chi -->
-    <RadioGroup
-        android:id="@+id/rgType"
+    <TextView
+        android:id="@+id/tvTypeLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Loại Giao dịch:"
+        android:textSize="16sp"
         android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/titlePageCreateEdit" />
+
+    <RadioGroup
+        android:id="@+id/rgTransactionType"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/titlePageCreateEdit">
-
-        <RadioButton
-            android:id="@+id/rbExpense"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="Chi tiêu (-)"
-            android:textColor="#F44336" />
+        app:layout_constraintTop_toBottomOf="@+id/tvTypeLabel">
 
         <RadioButton
             android:id="@+id/rbIncome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:text="Thu nhập (+)"
-            android:textColor="#4CAF50" />
+            android:text="Thu nhập"
+            android:layout_marginEnd="16dp" />
+
+        <RadioButton
+            android:id="@+id/rbExpense"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chi tiêu" />
     </RadioGroup>
 
     <EditText
-        android:id="@+id/edtItemName"
+        android:id="@+id/edtTransactionAmount"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="@android:color/white"
-        android:ems="10"
-        android:hint="Nội dung"
-        android:inputType="text"
+        android:hint="Số tiền (VND)"
+        android:inputType="numberDecimal"
         android:minHeight="48dp"
-        android:padding="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rgType" />
+        app:layout_constraintTop_toBottomOf="@+id/rgTransactionType" />
 
-    <EditText
-        android:id="@+id/edtQuantity"
+    <LinearLayout
+        android:id="@+id/layoutCategoryGroup"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:orientation="vertical"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="@android:color/white"
-        android:ems="10"
-        android:hint="Số lượng"
-        android:inputType="number"
-        android:minHeight="48dp"
-        android:padding="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtItemName" />
-
-    <EditText
-        android:id="@+id/edtUnitPrice"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="@android:color/white"
-        android:ems="10"
-        android:hint="Số tiền "
-        android:inputType="number"
-        android:minHeight="48dp"
-        android:padding="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtQuantity" />
+        app:layout_constraintTop_toBottomOf="@+id/edtTransactionAmount">
 
-    <!-- MỚI: Ô chọn ngày -->
+        <TextView
+            android:id="@+id/tvCategoryLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Danh mục:"
+            android:textSize="16sp" />
+
+        <Spinner
+            android:id="@+id/spnTransactionCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:layout_marginTop="8dp"
+            android:entries="@array/default_categories" />
+    </LinearLayout>
+
     <EditText
-        android:id="@+id/edtDate"
+        android:id="@+id/edtTransactionDate"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="@android:color/white"
-        android:ems="10"
+        android:hint="Ngày Giao dịch"
         android:focusable="false"
-        android:hint="Chọn ngày (dd/MM/yyyy)"
-        android:inputType="none"
+        android:clickable="true"
         android:minHeight="48dp"
-        android:padding="10dp"
+        android:drawableEnd="@android:drawable/ic_menu_today"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtUnitPrice" />
+        app:layout_constraintTop_toBottomOf="@+id/layoutCategoryGroup" />
+
+    <EditText
+        android:id="@+id/edtTransactionDescription"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Mô tả chi tiết"
+        android:inputType="textMultiLine"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtTransactionDate" />
 
     <Button
         android:id="@+id/btnSubmitCreate"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:text="Lưu"
+        android:text="LƯU GIAO DỊCH"
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/btnBackToMain"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/btnBackToMain"
+        style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="32dp"
-        android:text="Hủy / Quay lại"
+        android:text="QUAY LẠI"
+        android:textColor="#3F51B5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

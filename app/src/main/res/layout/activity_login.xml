@@ -9,25 +9,24 @@
 
     <TextView
         android:id="@+id/tvLoginTitle"
-        android:layout_width="296dp"
-        android:layout_height="96dp"
-        android:text="Welcome to Gà Shop"
+        android:layout_width="333dp"
+        android:layout_height="97dp"
+        android:text="Welcome To Smart Wallet"
         android:textAlignment="center"
         android:textSize="34sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.189" />
+        app:layout_constraintVertical_bias="0.176" />
 
     <EditText
         android:id="@+id/edtUsername"
         android:layout_width="378dp"
         android:layout_height="64dp"
         android:ems="10"
-        android:hint="username"
+        android:hint="Username"
         android:inputType="text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -41,7 +40,7 @@
         android:layout_width="378dp"
         android:layout_height="64dp"
         android:ems="10"
-        android:hint="password"
+        android:hint="Password"
         android:inputType="textPassword"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
