@@ -7,15 +7,20 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,9 +45,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvTotalExpense;
     private TextView tvBudgetNotification;
     private ListView lvRecentTransactions;
-    private Button btnAddTransaction;
-    private Button btnLogout;
-    private View budgetReportCard; // CardView báo cáo ngân sách
+    // ĐÃ XÓA: private Button btnAddTransaction; // Không còn tồn tại trong XML mới
+    private View budgetReportCard;
+    private BottomNavigationView bottomNavigationView;
 
     private SharedPreferences sharedPreferences;
     private DatabaseHelper dbHelper;
@@ -60,9 +65,7 @@ public class MainActivity extends AppCompatActivity {
         currentUserId = sharedPreferences.getLong("user_id", -1);
 
         initViews();
-        setupListeners();
 
-        // Kiểm tra phiên lần đầu
         if (currentUserId > 0) {
             checkSessionValidity();
         } else {
@@ -85,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
         currentUserId = sharedPreferences.getLong("user_id", -1);
 
         if (currentUserId > 0) {
-            // Kiểm tra hết hạn phiên
             long lastActive = sharedPreferences.getLong(PREF_LAST_ACTIVE_TIME, 0);
             long now = System.currentTimeMillis();
 
@@ -95,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            updateLastActiveTime(); // Cập nhật thời gian hoạt động
+            updateLastActiveTime();
             loadDashboardData();
         } else {
             redirectToLogin();
@@ -148,20 +150,41 @@ public class MainActivity extends AppCompatActivity {
         tvCurrentBalance = findViewById(R.id.tvCurrentBalance);
         tvTotalIncome = findViewById(R.id.tvTotalIncome);
         tvTotalExpense = findViewById(R.id.tvTotalExpense);
-        tvBudgetNotification = findViewById(R.id.tvBudgetNotification);
-        lvRecentTransactions = findViewById(R.id.lvItem); // ID: lvItem
-        btnAddTransaction = findViewById(R.id.btnAddTransaction);
-        btnLogout = findViewById(R.id.btnLogout);
+        lvRecentTransactions = findViewById(R.id.lvItem);
+        // ĐÃ XÓA: btnAddTransaction = findViewById(R.id.btnAddTransaction);
+        // ĐÃ XÓA: Logic click của btnAddTransaction
+
         budgetReportCard = findViewById(R.id.layoutBudgetReport);
-    }
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
 
-    private void setupListeners() {
-        btnAddTransaction.setOnClickListener(v -> {
-            startActivity(new Intent(this, CreateTransactionActivity.class));
+        // ⭐ ĐÃ SỬA: Thiết lập sự kiện cho Bottom Navigation ⭐
+        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int itemId = item.getItemId();
+
+                // DÙNG CÁC ID TỪ MENU XML BẠN CUNG CẤP TRƯỚC ĐÓ
+                if (itemId == R.id.nav_input) {
+                    Intent inputIntent = new Intent(MainActivity.this, CreateTransactionActivity.class);
+                    startActivity(inputIntent);
+                    return true;
+                } else if (itemId == R.id.nav_calendar) {
+                    Toast.makeText(MainActivity.this, "Chức năng Lịch chưa được cài đặt", Toast.LENGTH_SHORT).show();
+                    return true;
+                } else if (itemId == R.id.nav_report) {
+                    Toast.makeText(MainActivity.this, "Chức năng Báo cáo chưa được cài đặt", Toast.LENGTH_SHORT).show();
+                    return true;
+                } else if (itemId == R.id.nav_notifications) {
+                    Toast.makeText(MainActivity.this, "Chức năng Thông báo chưa được cài đặt", Toast.LENGTH_SHORT).show();
+                    return true;
+                } else if (itemId == R.id.nav_more) {
+                    Toast.makeText(MainActivity.this, "Chức năng Khác chưa được cài đặt", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                return false;
+            }
         });
-        btnLogout.setOnClickListener(v -> handleLogout());
     }
-
 
     // --- Data Loading & UI Logic ---
 
@@ -173,14 +196,12 @@ public class MainActivity extends AppCompatActivity {
         String currentMonthYear = monthYearFormat.format(calendar.getTime());
         String monthFilterCondition = DatabaseHelper.TRANS_DATE + " LIKE '%/" + currentMonthYear + "'";
 
-        // Tính toán các giá trị
         double totalIncomeMonthly = dbHelper.getTotalAmountByTypeAndFilter(currentUserId, "INCOME", monthFilterCondition);
         double totalExpenseMonthly = dbHelper.getTotalAmountByTypeAndFilter(currentUserId, "EXPENSE", monthFilterCondition);
         double totalOverallIncome = dbHelper.getTotalAmountByType(currentUserId, "INCOME");
         double totalOverallExpense = dbHelper.getTotalAmountByType(currentUserId, "EXPENSE");
         double currentBalance = totalOverallIncome - totalOverallExpense;
 
-        // Định dạng và hiển thị
         tvCurrentBalance.setText(formatCurrency(currentBalance));
         tvTotalIncome.setText(formatCurrency(totalIncomeMonthly));
         tvTotalExpense.setText(formatCurrency(totalExpenseMonthly));
@@ -189,7 +210,6 @@ public class MainActivity extends AppCompatActivity {
         updateBudgetNotification(totalExpenseMonthly);
     }
 
-    // ⭐ XỬ LÝ CLICK VÀ DIALOG SỬA/XÓA ⭐
     private void loadRecentTransactions() {
         ArrayList<Transaction> transactions = dbHelper.getTransactionsByUserId(currentUserId);
         TransactionAdapter adapter = new TransactionAdapter(this, transactions);
@@ -225,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("Xóa", (dialog, which) -> {
                     if (dbHelper.removeTransactionById(transaction.getId())) {
                         Toast.makeText(this, "Đã xóa giao dịch!", Toast.LENGTH_SHORT).show();
-                        loadDashboardData(); // Tải lại Dashboard sau khi xóa
+                        loadDashboardData();
                     } else {
                         Toast.makeText(this, "Lỗi xóa giao dịch.", Toast.LENGTH_SHORT).show();
                     }
@@ -271,10 +291,10 @@ public class MainActivity extends AppCompatActivity {
     private void sendBudgetNotification(String title, String message) {
         Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_alert) // Cần tạo Vector Asset này
+                .setSmallIcon(R.drawable.ic_alert)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
@@ -283,8 +303,7 @@ public class MainActivity extends AppCompatActivity {
                 .setAutoCancel(true);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        // ⭐ LỆNH BỔ SUNG: Gửi thông báo ⭐
-
+        notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 
     // --- Utility ---

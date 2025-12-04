@@ -5,11 +5,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View; // Import View
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout; // Import LinearLayout
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -22,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List; // Import List
 import java.util.Locale;
 
 public class CreateTransactionActivity extends AppCompatActivity {
@@ -32,18 +33,23 @@ public class CreateTransactionActivity extends AppCompatActivity {
     private RadioGroup rgTransactionType;
     private Button btnSubmitCreate, btnBackToMain;
     private TextView titlePageCreateEdit;
-    private LinearLayout layoutCategoryGroup; // Khai báo Layout nhóm Danh mục
+    private LinearLayout layoutCategoryGroup;
 
     // --- Biến trạng thái và dữ liệu ---
     private boolean isEditMode = false;
     private long transactionId = -1;
     private long currentUserId;
 
+    // ⭐ ĐÃ SỬA: Danh mục được phân loại thành 2 mảng riêng biệt ⭐
+    private final String[] expenseCategories = {"Ăn uống", "Di chuyển", "Nhà ở", "Hóa đơn", "Khác Chi tiêu"};
+    private final String[] incomeCategories = {"Lương", "Thưởng", "Đầu tư", "Thu khác"};
+
     // --- Hằng số và Helper ---
     private DatabaseHelper dbHelper;
     private final Calendar calendar = Calendar.getInstance();
     private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-    private final String[] categories = {"Ăn uống", "Di chuyển", "Nhà ở", "Hóa đơn", "Lương", "Đầu tư", "Khác"};
+
+    // Đã xóa mảng categories cũ
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,11 +80,11 @@ public class CreateTransactionActivity extends AppCompatActivity {
         edtTransactionDate = findViewById(R.id.edtTransactionDate);
         spnTransactionCategory = findViewById(R.id.spnTransactionCategory);
         rgTransactionType = findViewById(R.id.rgTransactionType);
-        layoutCategoryGroup = findViewById(R.id.layoutCategoryGroup); // Ánh xạ layout nhóm
+        layoutCategoryGroup = findViewById(R.id.layoutCategoryGroup);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_dropdown_item, categories);
-        spnTransactionCategory.setAdapter(adapter);
+        // ⭐ ĐÃ SỬA: Khởi tạo Spinner với Danh mục Chi tiêu mặc định ⭐
+        // Chúng ta sẽ luôn hiển thị Spinner, chỉ thay đổi nội dung bên trong.
+        loadCategories("EXPENSE");
 
         rgTransactionType.check(R.id.rbExpense);
     }
@@ -88,19 +94,30 @@ public class CreateTransactionActivity extends AppCompatActivity {
         btnBackToMain.setOnClickListener(v -> backToMain());
         setupDatePicker();
 
-        // Logic ẩn Danh mục khi chọn Thu nhập
+        // ⭐ ĐÃ SỬA: Logic xử lý chuyển đổi loại giao dịch và tải danh mục ⭐
         rgTransactionType.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.rbIncome) {
-                layoutCategoryGroup.setVisibility(View.GONE);
+                loadCategories("INCOME");
             } else if (checkedId == R.id.rbExpense) {
-                layoutCategoryGroup.setVisibility(View.VISIBLE);
+                loadCategories("EXPENSE");
             }
         });
 
-        // Cập nhật trạng thái khởi tạo (cho chế độ chỉnh sửa)
-        if (rgTransactionType.getCheckedRadioButtonId() == R.id.rbIncome) {
-            layoutCategoryGroup.setVisibility(View.GONE);
+        // Đã loại bỏ logic ẩn/hiện Layout Danh mục (vì giờ đây cả Thu và Chi đều có danh mục)
+    }
+
+    // ⭐ PHƯƠNG THỨC MỚI: Tải danh mục vào Spinner ⭐
+    private void loadCategories(String type) {
+        String[] currentCategories;
+        if (type.equals("INCOME")) {
+            currentCategories = incomeCategories;
+        } else {
+            currentCategories = expenseCategories;
         }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_dropdown_item, currentCategories);
+        spnTransactionCategory.setAdapter(adapter);
     }
 
     private boolean validateUser() {
@@ -130,6 +147,7 @@ public class CreateTransactionActivity extends AppCompatActivity {
     }
 
     private void loadTransactionData(long id) {
+        // Tên lớp Transaction phải có sẵn (đã được cung cấp ở cuối code này)
         Transaction transaction = dbHelper.getTransactionById(id);
 
         if (transaction != null) {
@@ -137,13 +155,21 @@ public class CreateTransactionActivity extends AppCompatActivity {
             edtTransactionDescription.setText(transaction.getDescription());
             edtTransactionDate.setText(transaction.getDate());
 
-            if ("INCOME".equals(transaction.getType())) {
+            String type = transaction.getType();
+            List<String> currentCategoryList;
+
+            if ("INCOME".equals(type)) {
                 rgTransactionType.check(R.id.rbIncome);
+                loadCategories("INCOME"); // Tải danh mục Thu nhập
+                currentCategoryList = Arrays.asList(incomeCategories);
             } else {
                 rgTransactionType.check(R.id.rbExpense);
+                loadCategories("EXPENSE"); // Tải danh mục Chi tiêu
+                currentCategoryList = Arrays.asList(expenseCategories);
             }
 
-            int categoryIndex = Arrays.asList(categories).indexOf(transaction.getCategory());
+            // ⭐ ĐÃ SỬA: Tìm category index trong mảng danh mục đúng loại ⭐
+            int categoryIndex = currentCategoryList.indexOf(transaction.getCategory());
             if (categoryIndex >= 0) {
                 spnTransactionCategory.setSelection(categoryIndex);
             }
@@ -161,8 +187,8 @@ public class CreateTransactionActivity extends AppCompatActivity {
         int selectedTypeId = rgTransactionType.getCheckedRadioButtonId();
         String type = (selectedTypeId == R.id.rbIncome) ? "INCOME" : "EXPENSE";
 
-        // Xử lý Category: Nếu là Thu nhập, gán giá trị mặc định, ngược lại lấy từ Spinner
-        String category = type.equals("INCOME") ? "Lương/Thu khác" : spnTransactionCategory.getSelectedItem().toString();
+        // ⭐ ĐÃ SỬA: Category luôn được lấy từ Spinner ⭐
+        String category = spnTransactionCategory.getSelectedItem().toString();
 
         if (TextUtils.isEmpty(amountStr)) {
             edtTransactionAmount.setError("Số tiền là bắt buộc");

@@ -90,8 +90,7 @@
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:layout_marginTop="8dp"
-            android:entries="@array/default_categories" />
-    </LinearLayout>
+            /> </LinearLayout>
 
     <EditText
         android:id="@+id/edtTransactionDate"

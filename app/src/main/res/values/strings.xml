@@ -1,12 +1,22 @@
 <resources>
     <string name="app_name">Quản Lý Chi Tiêu</string>
 
-    <string-array name="default_categories">
+    <string-array name="expense_categories">
         <item>Ăn uống</item>
         <item>Di chuyển</item>
         <item>Nhà ở</item>
+        <item>Hóa đơn</item>
+        <item>Quần áo</item>
+        <item>Y tế</item>
+        <item>Phí liên lạc</item>
+        <item>Khác Chi tiêu</item>
+    </string-array>
+
+    <string-array name="income_categories">
         <item>Lương</item>
+        <item>Thưởng</item>
         <item>Đầu tư</item>
-        <item>Khác</item>
+        <item>Thu nợ</item>
+        <item>Thu khác</item>
     </string-array>
 </resources>

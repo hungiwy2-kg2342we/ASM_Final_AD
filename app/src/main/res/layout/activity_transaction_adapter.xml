@@ -26,7 +26,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:contentDescription="@string/app_name"
-            android:src="@drawable/ic_expense_default"
+            android:src="@drawable/image_money"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
