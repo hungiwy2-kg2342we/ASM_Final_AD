@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_input"
+        android:icon="@drawable/pen"
+        android:title="Nhập vào" />
+
+    <item
+        android:id="@+id/nav_calendar"
+        android:icon="@drawable/calendar"
+        android:title="Lịch" />
+
+    <item
+        android:id="@+id/nav_report"
+        android:icon="@drawable/pie_chart"
+        android:title="Báo cáo" />
+
+    <item
+        android:id="@+id/nav_notifications"
+        android:icon="@drawable/bell"
+        android:title="Thông báo" />
+
+    <item
+        android:id="@+id/nav_more"
+        android:icon="@drawable/list"
+        android:title="Khác" />
+
+</menu>
